@@ -30,13 +30,13 @@ public class Turismo extends Vehiculo {
 
 	@Override
 	public String toString() {
-		return String.format("%s %s (%sCV) - %s", getMarca(), getModelo(), cilindrada, getMatricula());
+		return String.format("%s %s (%s cc) - %s", getMarca(), getModelo(), cilindrada, getMatricula());
 	}
 
 	@Override
 	public int getFactorPrecio() {
 		// TODO Auto-generated method stub
-		return FACTOR_CILINDRADA / cilindrada;
+		return getCilindrada() / FACTOR_CILINDRADA;
 	}
 
 }

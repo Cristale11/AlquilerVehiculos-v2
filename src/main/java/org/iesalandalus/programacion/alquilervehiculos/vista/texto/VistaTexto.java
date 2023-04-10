@@ -64,31 +64,19 @@ public class VistaTexto extends Vista {
 
 	public void buscarCliente() {
 		Consola.mostrarCabecera("Dame un cliente, por favor");
-		try {
-			getControlador().buscar(Consola.leerCliente());
-		} catch (OperationNotSupportedException e) {
-			e.printStackTrace();
-		}
+		getControlador().buscar(Consola.leerCliente());
 		
 	}
 
 	public void buscarVehiculo() {
 		Consola.mostrarCabecera("Dame un vehículo, por favor");
-		try {
-			getControlador().buscar(Consola.leerVehiculo());
-		} catch (OperationNotSupportedException e) {
-			e.printStackTrace();
-		}
+		getControlador().buscar(Consola.leerVehiculo());
 		
 	}
 
 	public void buscarAlquiler() {
 		Consola.mostrarCabecera("Dame un alquiler, por favor");
-		try {
-			getControlador().buscar(Consola.leerAlquiler());
-		} catch (OperationNotSupportedException e) {
-			e.printStackTrace();
-		}
+		getControlador().buscar(Consola.leerAlquiler());
 		
 	}
 

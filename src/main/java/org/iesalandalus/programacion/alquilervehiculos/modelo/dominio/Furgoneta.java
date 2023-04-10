@@ -6,7 +6,7 @@ public class Furgoneta extends Vehiculo {
 	private int pma;
 	private int plazas;
 
-	public Furgoneta(String marca, String modelo, String matricula, int pma, int plazas) {
+	public Furgoneta(String marca, String modelo, int pma, int plazas, String matricula) {
 		super(marca, modelo, matricula);
 		setPma(pma);
 		setPlazas(plazas);

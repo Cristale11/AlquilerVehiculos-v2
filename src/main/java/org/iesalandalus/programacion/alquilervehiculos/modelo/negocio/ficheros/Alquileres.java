@@ -1,21 +1,121 @@
 package org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.ficheros;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.naming.OperationNotSupportedException;
-
-import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Alquiler;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Cliente;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Vehiculo;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.IAlquileres;
-import org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.IClientes;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Alquiler;
+
+import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.lang.model.element.Element;
+import javax.naming.OperationNotSupportedException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class Alquileres implements IAlquileres {
+	private static final File FICHERO_ALQUILERES = new File(
+			"C:\\Users\\Crist\\\\git\\AlquilerVehiculos-v2\\datos\\alquileres.xml");
+	private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	private static final String RAIZ = "alquileres";
+	private static final String ALQUILER = "";
+	private static final String CLIENTE = "";
+	private static final String VEHICULO = "";
+	private static final String FECHA_ALQUILER = "";
+	private static final String FECHA_DEVOLUCION = "";
+	private static Alquileres instancia;
+
 	private List<Alquiler> coleccionAlquileres;
+
+	static Alquileres getInstancia() {
+		if (instancia == null)
+			instancia = new Alquileres();
+		return instancia;
+	}
+
+	public void comenzar() {
+
+		try {
+			leerDom(UtilidadesXml.leerXmlDeFichero(FICHERO_ALQUILERES));
+		} catch (OperationNotSupportedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void leerDom(Document documentoXml) throws OperationNotSupportedException {
+
+		NodeList nodosClientes = documentoXml.getElementsByTagName(ALQUILER);
+		for (int i = 0; i < nodosClientes.getLength(); i++) {
+			coleccionAlquileres.add(getAlquiler((Element) nodosClientes.item(i)));
+		}
+	}
+
+	private Alquiler getAlquiler(Element element) throws OperationNotSupportedException {
+
+		Node nodoCliente = (Node) element;
+
+		String cliente = nodoCliente.getAttributes().getNamedItem(CLIENTE).getTextContent();
+		String fechaAlquiler = nodoCliente.getAttributes().getNamedItem(FECHA_ALQUILER).getTextContent();
+		String vehiculo = nodoCliente.getAttributes().getNamedItem(VEHICULO).getTextContent();
+
+		Alquiler alquilerNuevo = new Alquiler(Cliente.getClienteConDni(cliente),
+				Vehiculo.getVehiculoConMatricula(vehiculo), LocalDate.parse(fechaAlquiler, FORMATO_FECHA));
+
+		if (nodoCliente.getAttributes().getNamedItem(FECHA_DEVOLUCION).getTextContent() != null) {
+			String fechaDevolucion = nodoCliente.getAttributes().getNamedItem(FECHA_DEVOLUCION).getTextContent();
+			alquilerNuevo.devolver(LocalDate.parse(fechaDevolucion, FORMATO_FECHA));
+		}
+		return alquilerNuevo;
+	}
+
+	public void terminar() {
+
+		UtilidadesXml.escribirXmlAFichero(crearDom(), FICHERO_ALQUILERES);
+
+	}
+
+	private Document crearDom() {
+		try {
+
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document documento = dBuilder.newDocument();
+			Element raiz = (Element) documento.createElement(RAIZ);
+			documento.appendChild((Node) raiz);
+			for (Alquiler alquiler : coleccionAlquileres) {
+				Element elementoAlquiler = getElemento(documento, alquiler);
+				((Node) raiz).appendChild((Node) elementoAlquiler);
+			}
+
+			return documento;
+
+		} catch (ParserConfigurationException e) {
+			System.out.println("Error al crear el DOM");
+			return null;
+		}
+	}
+
+	private Element getElemento(Document documentoXml, Alquiler alquiler) {
+		Element elementoAlquiler = (Element) documentoXml.createElement("alquiler");
+		((DocumentBuilderFactory) elementoAlquiler).setAttribute("cliente", alquiler.getCliente().getDni());
+		((DocumentBuilderFactory) elementoAlquiler).setAttribute("fechaAlquiler",
+				alquiler.getFechaAlquiler().format(FORMATO_FECHA));
+		if (alquiler.getFechaDevolucion() != null) {
+			((DocumentBuilderFactory) elementoAlquiler).setAttribute("fechaDevolucion",
+					alquiler.getFechaDevolucion().format(FORMATO_FECHA));
+		}
+		((DocumentBuilderFactory) elementoAlquiler).setAttribute("vehiculo", alquiler.getVehiculo().getMatricula());
+		return elementoAlquiler;
+	}
 
 	public Alquileres() {
 		coleccionAlquileres = new ArrayList<>();
@@ -23,7 +123,7 @@ public class Alquileres implements IAlquileres {
 
 	@Override
 	public List<Alquiler> get() {
-		return Collections.unmodifiableList(coleccionAlquileres);
+		return new ArrayList<>(coleccionAlquileres);
 	}
 
 	@Override
@@ -68,7 +168,7 @@ public class Alquileres implements IAlquileres {
 				}
 				if (alquiler.getVehiculo().equals(vehiculo)) {
 
-					throw new OperationNotSupportedException("ERROR: El turismo está actualmente alquilado.");
+					throw new OperationNotSupportedException("ERROR: El vehículo está actualmente alquilado.");
 				}
 
 			} else {
@@ -78,7 +178,7 @@ public class Alquileres implements IAlquileres {
 				}
 				if (alquiler.getVehiculo().equals(vehiculo) && (alquiler.getFechaDevolucion().isAfter(fechaAlquiler)
 						|| alquiler.getFechaDevolucion().isEqual(fechaAlquiler))) {
-					throw new OperationNotSupportedException("ERROR: El turismo tiene un alquiler posterior.");
+					throw new OperationNotSupportedException("ERROR: El vehículo tiene un alquiler posterior.");
 				}
 			}
 		}
@@ -172,5 +272,4 @@ public class Alquileres implements IAlquileres {
 		}
 		return null;
 	}
-
 }

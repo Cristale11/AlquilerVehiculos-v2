@@ -30,7 +30,7 @@ public class Controlador {
 	}
 
 	public void comenzar() {
-		modelo.comerzar();
+		modelo.comenzar();
 		vista.comenzar();
 	}
 
@@ -69,8 +69,12 @@ public class Controlador {
 		modelo.modificar(cliente, nombre, telefono);
 	}
 
-	public void devolver(Alquiler alquiler, LocalDate fechaDevolucion) throws OperationNotSupportedException {
-		modelo.devolver(alquiler, fechaDevolucion);
+	public void devolver(Cliente cliente, LocalDate fechaDevolucion) throws OperationNotSupportedException {
+		modelo.devolver(new Cliente(cliente), fechaDevolucion);
+	}
+
+	public void devolver(Vehiculo vehiculo, LocalDate fechaDevolucion) throws OperationNotSupportedException {
+		modelo.devolver(Vehiculo.copiar(vehiculo), fechaDevolucion);
 	}
 
 	public void borrar(Cliente cliente) throws OperationNotSupportedException {
@@ -86,23 +90,23 @@ public class Controlador {
 	}
 
 	public List<Cliente> getClientes() {
-		return modelo.getClientes();
+		return modelo.getListaClientes();
 	}
 
-	public List<Turismo> getTurismos() {
-		return modelo.getTurismos();
+	public List<Vehiculo> getVehiculos() {
+		return modelo.getListaVehiculos();
 	}
 
 	public List<Alquiler> getAlquileres() {
-		return modelo.getAlquileres();
+		return modelo.getListaAlquileres();
 	}
 
 	public List<Alquiler> getAlquileres(Cliente cliente) {
-		return modelo.getAlquileres(cliente);
+		return modelo.getListaAlquileres(cliente);
 	}
 
-	public List<Alquiler> getAlquileres(Vehiculo turismo) {
-		return modelo.getAlquileres(turismo);
+	public List<Alquiler> getAlquileres(Vehiculo vehiculo) {
+		return modelo.getListaAlquileres(Vehiculo.copiar(vehiculo));
 	}
 
 }

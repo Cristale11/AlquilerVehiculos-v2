@@ -19,7 +19,7 @@ public class Autobus extends Vehiculo {
 		setPlazas(autobus.plazas);
 	}
 
-	private int getPlazas() {
+	public int getPlazas() {
 		return plazas;
 	}
 

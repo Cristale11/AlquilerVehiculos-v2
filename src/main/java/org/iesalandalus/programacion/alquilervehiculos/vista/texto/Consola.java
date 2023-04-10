@@ -10,7 +10,6 @@ import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Cliente;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Furgoneta;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Turismo;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Vehiculo;
-import org.iesalandalus.programacion.alquilervehiculos.vista.Opcion;
 import org.iesalandalus.programacion.utilidades.Entrada;
 
 public class Consola {
@@ -28,6 +27,14 @@ public class Consola {
 			lineas.append("-");
 		}
 		System.out.printf("%n%s%n%s%n", mensaje, lineas);
+	}
+	public static void mostrarMenu() {
+		for (Accion accion : Accion.values()) {
+			if (accion.ordinal() != 0) {
+				System.out.printf("%s%n", accion);
+			}
+		}
+		System.out.println(Accion.SALIR);
 	}
 
 	private static String leerCadena(String mensaje) {
@@ -102,8 +109,8 @@ public class Consola {
 			vehiculoSalida = new Turismo(marca, modelo, leerEntero("Turismo con cilindrada:"), matricula);
 		}
 		if (tipoVehiculo == TipoVehiculo.FURGONETA) {
-			vehiculoSalida = new Furgoneta(marca, modelo, matricula, leerEntero("Con número de plazas:"),
-					leerEntero("Con Peso Máximo Autorizado:"));
+			vehiculoSalida = new Furgoneta(marca, modelo, leerEntero("Con Peso Máximo Autorizado:"), leerEntero("Con número de plazas:"),
+					matricula);
 		}
 
 		if (tipoVehiculo == TipoVehiculo.AUTOBUS) {
@@ -113,6 +120,9 @@ public class Consola {
 		return vehiculoSalida;
 	}
 
+	public static Vehiculo leerVehiculoMatricula() {
+		return Vehiculo.getVehiculoConMatricula(leerCadena("Vehiculo con matrícula:"));
+	}
 	public static Alquiler leerAlquiler() {
 		return new Alquiler(leerClienteDni(), leerVehiculo(), leerFecha("Dime una fecha de alquiler: ", PATRON_FECHA));
 	}
